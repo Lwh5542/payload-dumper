@@ -2,9 +2,24 @@
 import argparse
 import os
 from multiprocessing import cpu_count
-
+import requests
 from payload_dumper import http_file
 from payload_dumper.dumper import Dumper
+
+def send_notification(message):
+    webhook_url = "你的企业微信群机器人的Webhook URL"  # 替换为实际的Webhook URL
+    payload = {
+        "msgtype": "text",
+        "text": {
+            "content": message
+        }
+    }
+    try:
+        response = requests.post(webhook_url, json=payload)
+        response.raise_for_status()
+        print("通知发送成功")
+    except requests.RequestException as e:
+        print("通知发送失败:", e)
 
 def main():
     parser = argparse.ArgumentParser(description="OTA payload dumper")
@@ -69,3 +84,9 @@ def main():
 
     if isinstance(payload_file, http_file.HttpFile):
         print("\ntotal bytes read from network:", payload_file.total_bytes)
+    
+    # 发送通知
+    send_notification("执行完成")
+
+if __name__ == "__main__":
+    main()
